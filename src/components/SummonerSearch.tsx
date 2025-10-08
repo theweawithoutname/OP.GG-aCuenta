@@ -1,101 +1,113 @@
 // src/components/SummonerSearch.tsx
-import { mapRiotToSummonerData } from '../utils/dataMappers';
-import type { RiotSummonerResponse } from '../types/api';
+
+/* 
+  *FUNCIONA COMO INTERMEDIARIO ENTRE LA CAPA VISUAL Y LA API, gestionando errores, cargas y la llamada a la API
+  ? importa los hooks, las interfaces y el traductor
+  ? crea el estado del fetch integrando SummonerData y creo el estado de SummonerName
+
+
+
+*/
 import React, { useState, useEffect } from 'react';
-// Importamos los tipos de forma estricta (type-only)
-import type { SummonerData, FetchState } from '../types/api'; 
-// Asumimos que SummonerProfile ya está creado
-import SummonerProfile from '../SummonerProfile'; 
+// IMPORTACIONES: Traemos los Contratos y el Traductor
+import type { FetchState, SummonerData } from '../types/api';
+import { mapRiotToSummonerData } from '../utils/dataMappers';
 
-// [CONFIGURACIÓN] ¡IMPORTANTE! Reemplaza con tus datos.
-const REGION = 'la2'; // Ejemplo: Latinoamérica Sur
-const BASE_URL = `https://${REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-name/`;
-const API_KEY = 'TU_CLAVE_API_AQUI'; 
-
-// Define el estado inicial con el tipo correcto
-const initialFetchState: FetchState<SummonerData> = {
-  data: null,
-  loading: false,
-  error: null,
-};
+// Importaciones de Contratos (Componentes de Presentación que usaremos después)
+import SummonerProfile from '../SummonerProfile';
+import SearchForm from './SearchForm';
 
 const SummonerSearch: React.FC = () => {
-  // Estado que guarda el nombre introducido por el usuario (el "input" de la lógica)
-  const [inputName, setInputName] = useState<string>('doblelift'); // Valor inicial de ejemplo
+  // 1. ESTADO DE LA BÚSQUEDA (El Registro de la Lógica)
+  
+  // fetchState: Guarda el resultado del fetch (datos, carga, error) usando el tipo limpio SummonerData.
+  const [fetchState, setFetchState] = useState<FetchState<SummonerData>>({
+    data: null,
+    loading: false,
+    error: null,
+  });
+  
+  // summonerName: Guarda el nombre que dispara la búsqueda. Este es el 'input' del useEffect.
+  const [summonerName, setSummonerName] = useState<string>('');
+  
+  // ----------------------------------------------------------------------
+  
+  // 2. FUNCIÓN DE ACCIÓN ASCENDENTE (Contrato para el Hijo)
 
-  // Estado que guarda el resultado de la API (el "output" de la lógica)
-  const [fetchState, setFetchState] = useState<FetchState<SummonerData>>(initialFetchState);
-
-  // useEffect: Se ejecuta cuando la dependencia [inputName] cambia.
-  useEffect(() => {
-    // 1. Condición de Salida: Si no hay nombre, no hacemos la llamada.
-    if (!inputName) return; 
-
-    const fetchSummoner = async () => {
-      // 2. Estado de Carga: Activamos 'loading' y limpiamos errores.
-      setFetchState({ data: null, loading: true, error: null }); 
-
-      try {
-        const url = `${BASE_URL}${encodeURIComponent(inputName)}?api_key=${API_KEY}`;
-        const response = await fetch(url);
-        
-        // 3. Manejo de Errores HTTP
-        if (!response.ok) {
-          // Por ejemplo, 404 Not Found o 403 Forbidden (API Key inválida)
-          const message = `Error ${response.status}: Invocador no encontrado o problema con la API.`;
-          throw new Error(message);
-        }
-        
-        const rawData: RiotSummonerResponse = await response.json();
-
-        const transformedData: SummonerData = mapRiotToSummonerData(rawData);
-        
-        // 5. Éxito: Guardamos los datos.
-        setFetchState({ data: transformedData, loading: false, error: null }); 
-        
-      } catch (e) {
-        let errorMessage: string;
-        if(e instanceof Error) {
-            errorMessage = e.message;
-        } else {
-            errorMessage = 'Ocurrio un error desconocido durante la conexion.';
-        }
-        setFetchState({ data: null, loading: false, error: errorMessage});
-          }
-    };
-
-    fetchSummoner();
-    // La función se vuelve a ejecutar cuando inputName cambie
-  }, [inputName]); 
-
-  // La función de búsqueda (se pasaría al componente SearchForm como 'callback')
+  // handleSearch es el *callback* que le pasaremos al SearchForm (el hijo).
+  // Es la única forma en que el hijo puede comunicarse con la lógica del padre.
   const handleSearch = (name: string) => {
-      setInputName(name); // Esto dispara el useEffect
+    // Al ser llamada por el formulario, actualiza el estado,
+    // lo cual, a su vez, activa el useEffect (el fetch).
+    setSummonerName(name); 
   };
   
-  // --- Renderizado (Pasa los datos del fetch al componente de Presentación) ---
-  return (
-    <div className="p-4 max-w-2xl mx-auto">
-      {/* 🛑 Aquí se colocaría el componente SearchForm, pasándole handleSearch como prop onSearch */}
-      {/* <SearchForm onSearch={handleSearch} /> */}
-      
-      {/* 🔴 Muestra el estado de Carga */}
-      {fetchState.loading && (
-        <div className="mt-6">
-            {/* Aquí iría tu componente LoadingSkeleton */}
-            <p className="text-blue-500">Cargando perfil...</p> 
-        </div>
-      )}
+  // ----------------------------------------------------------------------
+  
+  // 3. EFECTO SECUNDARIO (El Motor de la API)
 
-      {/* 🟢 Muestra los Datos */}
+  useEffect(() => {
+    // Si el nombre está vacío (ej. al inicio), salimos sin hacer nada.
+    if (!summonerName) return; 
+
+    const fetchSummoner = async () => {
+      // INICIO: Activar carga y limpiar errores/datos anteriores.
+      setFetchState({ data: null, loading: true, error: null });
+
+      try {
+        // Lógica de la llamada
+        const apiKey = import.meta.env.VITE_RIOT_API_KEY; 
+        const url = `.../summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
+
+        const response = await fetch(url);
+
+        // MANEJO DE ERRORES HTTP (Ej: Invocador no existe)
+        if (!response.ok) {
+          const errorMsg = response.status === 404 
+            ? `Invocador "${summonerName}" no encontrado.`
+            : `Error de la API: ${response.status} (${response.statusText})`;
+          throw new Error(errorMsg);
+        }
+
+        const rawData = await response.json();
+        
+        // TRADUCCIÓN: Usamos la función de mapeo (el 'dataMapper') para limpiar los datos
+        const transformedData = mapRiotToSummonerData(rawData); 
+
+        // ÉXITO: Guardamos los datos limpios y finalizamos la carga.
+        setFetchState({ data: transformedData, loading: false, error: null });
+
+      } catch (e) {
+        // ERROR: Gestión de errores tipada
+        const errorMessage = e instanceof Error ? e.message : 'Error desconocido.';
+        setFetchState({ data: null, loading: false, error: errorMessage });
+      }
+    };
+
+    fetchSummoner(); 
+  // ARRAY DE DEPENDENCIA: Solo se ejecuta si 'summonerName' cambia
+  }, [summonerName]); 
+  
+  // ----------------------------------------------------------------------
+  
+  // 4. RENDERIZADO (Contratos de Flujo)
+
+  return (
+    <div className="p-8 max-w-lg mx-auto">
+      {/* 🔴 CONTRATO ARRIBA: Pasa la función de control al hijo (SearchForm) */}
+      <SearchForm onSearch={handleSearch} />
+
+      {/* 🟡 RENDERIZADO CONDICIONAL: Muestra un mensaje mientras carga */}
+      {fetchState.loading && <p className="mt-6 text-blue-600">Cargando datos de invocador...</p>}
+
+      {/* 🟢 CONTRATO ABAJO: Pasa los datos limpios al hijo (SummonerProfile) */}
       {fetchState.data && (
         <div className="mt-6">
-          {/* El componente de LÓGICA pasa el dato al componente de PRESENTACIÓN */}
           <SummonerProfile data={fetchState.data} /> 
         </div>
       )}
 
-      {/* 🟡 Muestra el Error */}
+      {/* 🔴 Muestra el Error */}
       {fetchState.error && (
         <p className="mt-6 p-4 text-red-700 bg-red-100 border-l-4 border-red-500 rounded">
           {fetchState.error}
