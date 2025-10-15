@@ -4,6 +4,20 @@
   *FUNCIONA COMO INTERMEDIARIO ENTRE LA CAPA VISUAL Y LA API, gestionando errores, cargas y la llamada a la API
   ? importa los hooks, las interfaces y el traductor
   ? crea el estado del fetch integrando SummonerData y creo el estado de SummonerName
+  ? handleSearch tomara el nombre que demos en la interfaz visual y cambiara el estado de SummonerName
+  ? al cambiar el estado de SummonerName, se activa el efecto secundario que hace lo siguiente:
+    ? - resetea el estado del fetch
+    ? - inicia el try esperando a la red
+    ? - si la red falla fuerza un error
+    ? - sino falla, espera los datos de la API en crudo
+    ? - transforma los datos de la API con la funcion del dataMapper
+    ? - define los datos del fetch como los datos transformados
+    ! en caso de haber un error desconocido hay un catch por defecto
+  ? si hay datos se genera el SummonerProfile con los datos del fetch
+  ? si fetch esta en loading se genera un P con texto cargando
+  ? si hay un error se genera el P con el error
+
+  * SummonerSearch -----> types/props 
 
 
 

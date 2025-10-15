@@ -1,16 +1,9 @@
 // SummonerProfile.tsx (fragmento)
-
+import { type SummonerProfileProps } from './types/Props';
 import React from 'react';
 import SummonerIcon from './components/SummonerIcon';
 
 // Asumimos que esta interfaz ya está definida en otro archivo.
-interface SummonerProfileProps {
-  data: {
-    name: string;
-    level: number;
-    profileIconUrl: string; // URL que obtienes de la API
-  };
-}
 
 const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
   return (
