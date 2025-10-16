@@ -39,43 +39,33 @@ const REGION_GLOBAL= 'americas';
 const ACCOUNT_V1_URL = `https://${REGION_GLOBAL}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/`;
 const SUMMONER_V4_URL = `https://${REGION_PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
 
-const SummonerSearch: React.FC = () => {
-  // 1. ESTADO DE LA BÚSQUEDA (El Registro de la Lógica)
-  
-  // fetchState: Guarda el resultado del fetch (datos, carga, error) usando el tipo limpio SummonerData.
+export interface SummonerSearchProps {
+  initialGameName: string;
+  initialTagLine: string;
+}
+
+const SummonerSearch: React.FC<SummonerSearchProps> = ({initialGameName, initialTagLine}) => {
   const [fetchState, setFetchState] = useState<FetchState<SummonerData>>({
     data: null,
     loading: false,
     error: null,
   });
   
-  // summonerName: Guarda el nombre que dispara la búsqueda. Este es el 'input' del useEffect.
-  const [gameName, setGameName] = useState<string>('');
-  const [tagLine, setTagLine] = useState<string>('');
-  
-  // ----------------------------------------------------------------------
-  
-  // 2. FUNCIÓN DE ACCIÓN ASCENDENTE (Contrato para el Hijo)
 
-  // handleSearch es el *callback* que le pasaremos al SearchForm (el hijo).
-  // Es la única forma en que el hijo puede comunicarse con la lógica del padre.
+  const [gameName, setGameName] = useState<string>(initialGameName);
+  const [tagLine, setTagLine] = useState<string>(initialTagLine);
+  
+
   const handleSearch = (gName: string, tLine: string) => {
-    // Al ser llamada por el formulario, actualiza el estado,
-    // lo cual, a su vez, activa el useEffect (el fetch).
     setGameName(gName);
     setTagLine(tLine);
   };
   
-  // ----------------------------------------------------------------------
-  
-  // 3. EFECTO SECUNDARIO (El Motor de la API)
 
   useEffect(() => {
-    // Si el nombre está vacío (ej. al inicio), salimos sin hacer nada.
     if (!gameName || !tagLine) return; 
 
     const fetchSummoner = async () => {
-      // INICIO: Activar carga y limpiar errores/datos anteriores.
       setFetchState({ data: null, loading: true, error: null });
 
       try {
