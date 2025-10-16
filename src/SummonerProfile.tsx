@@ -1,4 +1,7 @@
 // SummonerProfile.tsx (fragmento)
+
+/* */
+
 import { type SummonerProfileProps } from './types/Props';
 import React from 'react';
 import SummonerIcon from './components/SummonerIcon';

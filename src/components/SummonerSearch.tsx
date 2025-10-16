@@ -31,6 +31,8 @@ import { mapRiotToSummonerData } from '../utils/dataMappers';
 import SummonerProfile from '../SummonerProfile';
 import SearchForm from './SearchForm';
 
+import KataLoading from '../assets/KataLoading.gif'
+
 const REGION_PLATFORM= 'la2';
 const REGION_GLOBAL= 'americas';
 
@@ -134,7 +136,10 @@ const SummonerSearch: React.FC = () => {
       <SearchForm onSearch={handleSearch} />
 
       {/* 🟡 RENDERIZADO CONDICIONAL: Muestra un mensaje mientras carga */}
-      {fetchState.loading && <p className="mt-6 text-blue-600">Cargando datos de invocador...</p>}
+      {fetchState.loading && 
+      <div className='flex justify-center'>
+        <img src={KataLoading} alt="Cargando perfil..."/>
+      </div>}
 
       {/* 🟢 CONTRATO ABAJO: Pasa los datos limpios al hijo (SummonerProfile) */}
       {fetchState.data && (
