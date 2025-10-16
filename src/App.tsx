@@ -1,18 +1,22 @@
+// src/App.tsx
 
-import SummonerProfile from "./SummonerProfile";
+import React from 'react';
+// Importamos el componente de lógica principal
+import SummonerSearch from './components/SummonerSearch'; 
 
-function App() {
-  const mockData = {
-    name: "MockSummonerName",
-    level: 42,
-    profileIconUrl: "https://media.istockphoto.com/id/636379014/es/foto/manos-la-formaci%C3%B3n-de-una-forma-de-coraz%C3%B3n-con-silueta-al-atardecer.jpg?s=612x612&w=0&k=20&c=R2BE-RgICBnTUjmxB8K9U0wTkNoCKZRi-Jjge8o_OgE=" // Debe ser una URL válida
-  };
+// Ya no necesitamos importar './index.css' aquí si ya lo importamos en main.tsx
 
+const App: React.FC = () => {
   return (
-    <div className="p-8">
-      <SummonerProfile data={mockData} /> 
+    // 🎨 Layout principal: Un contenedor centrado para toda la aplicación
+    <div className="min-h-screen bg-gray-100 p-6 flex justify-center">
+      
+      {/* ➡️ Composición Principal: Inyectamos el motor de la aplicación */}
+      {/* El componente SummonerSearch contiene SearchForm, lógica y SummonerProfile. */}
+      <SummonerSearch />
+      
     </div>
   );
-}
+};
 
 export default App;

@@ -31,6 +31,12 @@ import { mapRiotToSummonerData } from '../utils/dataMappers';
 import SummonerProfile from '../SummonerProfile';
 import SearchForm from './SearchForm';
 
+const REGION_PLATFORM= 'la2';
+const REGION_GLOBAL= 'americas';
+
+const ACCOUNT_V1_URL = `https://${REGION_GLOBAL}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/`;
+const SUMMONER_V4_URL = `https://${REGION_PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
+
 const SummonerSearch: React.FC = () => {
   // 1. ESTADO DE LA BÚSQUEDA (El Registro de la Lógica)
   
@@ -42,7 +48,8 @@ const SummonerSearch: React.FC = () => {
   });
   
   // summonerName: Guarda el nombre que dispara la búsqueda. Este es el 'input' del useEffect.
-  const [summonerName, setSummonerName] = useState<string>('');
+  const [gameName, setGameName] = useState<string>('');
+  const [tagLine, setTagLine] = useState<string>('');
   
   // ----------------------------------------------------------------------
   
@@ -50,10 +57,11 @@ const SummonerSearch: React.FC = () => {
 
   // handleSearch es el *callback* que le pasaremos al SearchForm (el hijo).
   // Es la única forma en que el hijo puede comunicarse con la lógica del padre.
-  const handleSearch = (name: string) => {
+  const handleSearch = (gName: string, tLine: string) => {
     // Al ser llamada por el formulario, actualiza el estado,
     // lo cual, a su vez, activa el useEffect (el fetch).
-    setSummonerName(name); 
+    setGameName(gName);
+    setTagLine(tLine);
   };
   
   // ----------------------------------------------------------------------
@@ -62,7 +70,7 @@ const SummonerSearch: React.FC = () => {
 
   useEffect(() => {
     // Si el nombre está vacío (ej. al inicio), salimos sin hacer nada.
-    if (!summonerName) return; 
+    if (!gameName || !tagLine) return; 
 
     const fetchSummoner = async () => {
       // INICIO: Activar carga y limpiar errores/datos anteriores.
@@ -70,20 +78,34 @@ const SummonerSearch: React.FC = () => {
 
       try {
         // Lógica de la llamada
-        const apiKey = import.meta.env.VITE_RIOT_API_KEY; 
-        const url = `.../summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
+        const encodedGameName = encodeURIComponent(gameName);
+        const encodedTagLine = encodeURIComponent(tagLine);
 
-        const response = await fetch(url);
+        const apiKey = import.meta.env.VITE_RIOT_API_KEY; 
+
+        const accountUrl = `${ACCOUNT_V1_URL}${encodedGameName}/${encodedTagLine}?api_key=${apiKey}`;
+
+        const accountResponse = await fetch(accountUrl);
 
         // MANEJO DE ERRORES HTTP (Ej: Invocador no existe)
-        if (!response.ok) {
-          const errorMsg = response.status === 404 
-            ? `Invocador "${summonerName}" no encontrado.`
-            : `Error de la API: ${response.status} (${response.statusText})`;
+        if (!accountResponse.ok) {
+          const errorMsg = accountResponse.status === 404 
+            ? `Invocador "${gameName}" no encontrado.`
+            : `Error de la API: ${accountResponse.status} (${accountResponse.statusText})`;
           throw new Error(errorMsg);
         }
 
-        const rawData = await response.json();
+        const accountData: { puuid: string } = await accountResponse.json();
+        const puuid = accountData.puuid;
+
+        const summonerUrl = `${SUMMONER_V4_URL}${puuid}?api_key=${apiKey}`;
+
+        const summonerResponse = await fetch(summonerUrl);
+            if (!summonerResponse.ok) {
+                throw new Error(`Error en Summoner API: ${summonerResponse.status}`);
+            }
+        
+        const rawData = await summonerResponse.json();
         
         // TRADUCCIÓN: Usamos la función de mapeo (el 'dataMapper') para limpiar los datos
         const transformedData = mapRiotToSummonerData(rawData); 
@@ -100,7 +122,7 @@ const SummonerSearch: React.FC = () => {
 
     fetchSummoner(); 
   // ARRAY DE DEPENDENCIA: Solo se ejecuta si 'summonerName' cambia
-  }, [summonerName]); 
+  }, [gameName, tagLine]); 
   
   // ----------------------------------------------------------------------
   
