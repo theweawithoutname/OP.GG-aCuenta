@@ -2,9 +2,9 @@
 
 /* */
 
-import { type SummonerProfileProps } from './types/Props';
+import { type SummonerProfileProps } from '../types/Props';
 import React from 'react';
-import SummonerIcon from './components/SummonerIcon';
+import SummonerIcon from './SummonerIcon';
 
 // Asumimos que esta interfaz ya está definida en otro archivo.
 
