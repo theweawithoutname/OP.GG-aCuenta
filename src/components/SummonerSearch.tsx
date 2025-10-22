@@ -2,20 +2,6 @@
 
 /* 
   *FUNCIONA COMO INTERMEDIARIO ENTRE LA CAPA VISUAL Y LA API, gestionando errores, cargas y la llamada a la API
-  ? importa los hooks, las interfaces y el traductor
-  ? crea el estado del fetch integrando SummonerData y creo el estado de SummonerName
-  ? handleSearch tomara el nombre que demos en la interfaz visual y cambiara el estado de SummonerName
-  ? al cambiar el estado de SummonerName, se activa el efecto secundario que hace lo siguiente:
-    ? - resetea el estado del fetch
-    ? - inicia el try esperando a la red
-    ? - si la red falla fuerza un error
-    ? - sino falla, espera los datos de la API en crudo
-    ? - transforma los datos de la API con la funcion del dataMapper
-    ? - define los datos del fetch como los datos transformados
-    ! en caso de haber un error desconocido hay un catch por defecto
-  ? si hay datos se genera el SummonerProfile con los datos del fetch
-  ? si fetch esta en loading se genera un P con texto cargando
-  ? si hay un error se genera el P con el error
 
   * SummonerSearch -----> types/props 
 
@@ -23,21 +9,19 @@
 
 */
 import React, { useState, useEffect } from 'react';
-// IMPORTACIONES: Traemos los Contratos y el Traductor
-import type { FetchState, SummonerData } from '../types/api';
+import type { FetchState, RankData, SummonerData, RiotSummonerResponse } from '../types/api';
 import { mapRiotToSummonerData } from '../utils/dataMappers';
 
 // Importaciones de Contratos (Componentes de Presentación que usaremos después)
-import SummonerProfile from '../SummonerProfile';
-import SearchForm from './SearchForm';
-
+import SummonerProfile from './SummonerProfile';
+//import SearchForm from './SearchForm';
 import KataLoading from '../assets/KataLoading.gif'
 
 const REGION_PLATFORM= 'la2';
 const REGION_GLOBAL= 'americas';
-
 const ACCOUNT_V1_URL = `https://${REGION_GLOBAL}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/`;
 const SUMMONER_V4_URL = `https://${REGION_PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
+const LEAGUE_V4_URL = `https://${REGION_PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/`;
 
 export interface SummonerSearchProps {
   initialGameName: string;
@@ -51,70 +35,82 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({initialGameName, initial
     error: null,
   });
   
-
-  const [gameName, setGameName] = useState<string>(initialGameName);
-  const [tagLine, setTagLine] = useState<string>(initialTagLine);
-  
-
-  const handleSearch = (gName: string, tLine: string) => {
-    setGameName(gName);
-    setTagLine(tLine);
-  };
-  
-
-  useEffect(() => {
-    if (!gameName || !tagLine) return; 
+useEffect(() => {
+    // 1. Condición de Salida: Se usa initialGameName/TagLine directamente.
+    if (!initialGameName || !initialTagLine) return; 
 
     const fetchSummoner = async () => {
-      setFetchState({ data: null, loading: true, error: null });
-
-      try {
-        // Lógica de la llamada
-        const encodedGameName = encodeURIComponent(gameName);
-        const encodedTagLine = encodeURIComponent(tagLine);
-
+        // A. INICIO: Establecer el estado de carga
+        setFetchState({ data: null, loading: true, error: null });
         const apiKey = import.meta.env.VITE_RIOT_API_KEY; 
 
-        const accountUrl = `${ACCOUNT_V1_URL}${encodedGameName}/${encodedTagLine}?api_key=${apiKey}`;
+        try {
+            // ------------------------------------------------------------------
+            // FASE 1: OBTENER PUUID (API Account-V1 - Global)
+            // ------------------------------------------------------------------
+            const encodedGameName = encodeURIComponent(initialGameName);
+            const encodedTagLine = encodeURIComponent(initialTagLine);
 
-        const accountResponse = await fetch(accountUrl);
+            const accountUrl = `${ACCOUNT_V1_URL}${encodedGameName}/${encodedTagLine}?api_key=${apiKey}`;
+            const accountResponse = await fetch(accountUrl);
 
-        // MANEJO DE ERRORES HTTP (Ej: Invocador no existe)
-        if (!accountResponse.ok) {
-          const errorMsg = accountResponse.status === 404 
-            ? `Invocador "${gameName}" no encontrado.`
-            : `Error de la API: ${accountResponse.status} (${accountResponse.statusText})`;
-          throw new Error(errorMsg);
-        }
-
-        const accountData: { puuid: string } = await accountResponse.json();
-        const puuid = accountData.puuid;
-
-        const summonerUrl = `${SUMMONER_V4_URL}${puuid}?api_key=${apiKey}`;
-
-        const summonerResponse = await fetch(summonerUrl);
-            if (!summonerResponse.ok) {
-                throw new Error(`Error en Summoner API: ${summonerResponse.status}`);
+            if (!accountResponse.ok) {
+                const errorMsg = accountResponse.status === 404 
+                    ? `Riot ID "${initialGameName}#${initialTagLine}" no encontrado.`
+                    : `Error en la API de Cuenta: ${accountResponse.status} (${accountResponse.statusText})`;
+                throw new Error(errorMsg);
             }
-        
-        const rawData = await summonerResponse.json();
-        
-        // TRADUCCIÓN: Usamos la función de mapeo (el 'dataMapper') para limpiar los datos
-        const transformedData = mapRiotToSummonerData(rawData); 
 
-        // ÉXITO: Guardamos los datos limpios y finalizamos la carga.
-        setFetchState({ data: transformedData, loading: false, error: null });
+            const accountData: { puuid: string } = await accountResponse.json();
+            const puuid = accountData.puuid;
 
-      } catch (e) {
-        // ERROR: Gestión de errores tipada
-        const errorMessage = e instanceof Error ? e.message : 'Error desconocido.';
-        setFetchState({ data: null, loading: false, error: errorMessage });
-      }
+            // ------------------------------------------------------------------
+            // FASE 2: OBTENER PERFIL BÁSICO (API Summoner-V4 - Plataforma)
+            // ------------------------------------------------------------------
+            const summonerUrl = `${SUMMONER_V4_URL}${puuid}?api_key=${apiKey}`;
+            const summonerResponse = await fetch(summonerUrl);
+            
+            if (!summonerResponse.ok) {
+                throw new Error(`Error en la API de Perfil: ${summonerResponse.status}`);
+            }
+            
+            const rawProfileData: RiotSummonerResponse = await summonerResponse.json();
+
+            // ------------------------------------------------------------------
+            // FASE 3: OBTENER DATOS DE RANGO (API League-V4 - Plataforma)
+            // ------------------------------------------------------------------
+            const leagueUrl = `${LEAGUE_V4_URL}${puuid}?api_key=${apiKey}`;
+            const leagueResponse = await fetch(leagueUrl);
+
+            if (!leagueResponse.ok) {
+                // Nota: Los jugadores NO rankeados a menudo devuelven 404. Riot lo trata como fallo.
+                if (leagueResponse.status === 404) {
+                    // Si el jugador no tiene rank, devolvemos un array vacío para que el mapeador no falle.
+                    // Pero la lógica de tu if (!leagueResponse.ok) lo atraparía, así que lo dejamos fallar.
+                    throw new Error(`Error en la API de Liga: ${leagueResponse.status}. (Jugador no rankeado o error)`);
+                }
+                throw new Error(`Error en la API de Liga: ${leagueResponse.status}`);
+            }
+            
+            const rawRankData: RankData[] = await leagueResponse.json();
+            
+            // ------------------------------------------------------------------
+            // FASE 4: CONSOLIDACIÓN Y ÉXITO
+            // --------------------------------------------------
+            const transformedData = mapRiotToSummonerData(rawProfileData, rawRankData); 
+
+            setFetchState({ data: transformedData, loading: false, error: null });
+
+        } catch (e) {
+            // C. ERROR: Gestión del error y actualización del estado
+            const errorMessage = e instanceof Error ? e.message : 'Error de red desconocido.';
+            setFetchState({ data: null, loading: false, error: errorMessage });
+        }
     };
 
     fetchSummoner(); 
-  // ARRAY DE DEPENDENCIA: Solo se ejecuta si 'summonerName' cambia
-  }, [gameName, tagLine]); 
+// 🛑 DEPENDENCIAS: El fetch se ejecuta si la URL (props) cambia.
+}, [initialGameName, initialTagLine]);
   
   // ----------------------------------------------------------------------
   
@@ -123,7 +119,6 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({initialGameName, initial
   return (
     <div className="p-8 max-w-lg mx-auto">
       {/* 🔴 CONTRATO ARRIBA: Pasa la función de control al hijo (SearchForm) */}
-      <SearchForm onSearch={handleSearch} />
 
       {/* 🟡 RENDERIZADO CONDICIONAL: Muestra un mensaje mientras carga */}
       {fetchState.loading && 

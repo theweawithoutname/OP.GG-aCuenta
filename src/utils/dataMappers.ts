@@ -10,19 +10,20 @@
  *  ? 5-retornamos los datos traducidos, el summonerlevel simplificado y la URL del icono que usaremos mas tarde
  */ 
 
-import type { RiotSummonerResponse, SummonerData } from '../types/api';
+import type { RiotSummonerResponse, SummonerData, RankData } from '../types/api';
 
 // *Nota: Esto debería obtenerse dinámicamente, pero se usa una constante por ahora.
 const DDRAGON_VERSION = '14.20.1'; // Asegúrate de actualizar la versión
 
-export function mapRiotToSummonerData(riotData: RiotSummonerResponse): SummonerData {
+export function mapRiotToSummonerData(riotProfileData: RiotSummonerResponse, rawRankData: RankData[]): SummonerData {
   
   const profileIconUrl = 
-    `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/profileicon/${riotData.profileIconId}.png`;
+    `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/profileicon/${riotProfileData.profileIconId}.png`;
 
   return {
-    name: riotData.name,
-    level: riotData.summonerLevel, // Mapeo de nombre: summonerLevel -> level
-    profileIconUrl: profileIconUrl, // Creación de la URL a partir del ID
+    name: riotProfileData.name,
+    level: riotProfileData.summonerLevel, // Mapeo de nombre: summonerLevel -> level
+    profileIconUrl: profileIconUrl,
+    ranks: rawRankData, // Creación de la URL a partir del ID
   };
 }

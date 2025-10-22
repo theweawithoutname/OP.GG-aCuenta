@@ -1,11 +1,11 @@
 // SummonerIcon.tsx
 /* 
-  *COMPONENTE vISUAL DEL ICONO
-  
+  *COMPONENTE VISUAL DEL ICONO
+  *SummonerIcon ------> SummonerProfile
 */
 
 import React from 'react';
-import {type SummonerIconProps } from '../types/Props';
+import {type SummonerIconProps } from '../types/props';
 
 
 const SummonerIcon: React.FC<SummonerIconProps> = ({ iconUrl, altText }) => {
