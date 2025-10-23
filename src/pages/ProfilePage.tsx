@@ -9,21 +9,22 @@ import SearchForm from '../components/SearchForm'; // ⬅️ Importamos el formu
 interface RouteParams extends Record<string, string | undefined>{
     gameName: string | undefined; 
     tagLine: string | undefined;
+    regionPlatform: string;
 }
 
 const ProfilePage: React.FC = () => {
     const navigate = useNavigate(); // ⬅️ Hook para forzar la navegación
-    const { gameName, tagLine } = useParams<RouteParams>();
+    const { gameName, tagLine, regionPlatform } = useParams<RouteParams>();
 
     // 🔑 CALLBACK DE NAVEGACIÓN: Se ejecuta cuando el SearchForm se usa en esta página
-    const handleNewSearch = (gName: string, tLine: string) => {
+    const handleNewSearch = (gName: string, tLine: string, regionPlatform: string) => {
         // Al buscar un nuevo perfil, navegamos a la nueva URL.
         // Esto hace que ProfilePage se re-renderice con los nuevos parámetros, disparando un nuevo fetch.
-        const profilePath = `/profile/${gName}/${tLine}`;
+        const profilePath = `/profile/${gName}/${tLine}/${regionPlatform}`;
         navigate(profilePath);
     };
 
-    if (!gameName || !tagLine) {
+    if (!gameName || !tagLine || !regionPlatform) {
         return <div className="text-red-500 mt-20">Error: Datos de perfil incompletos.</div>;
     }
 
@@ -36,7 +37,7 @@ const ProfilePage: React.FC = () => {
             </header>
             
             {/* 🎯 Motor de Lógica: Recibe los datos de la URL y se dispara automáticamente. */}
-            <SummonerSearch initialGameName={gameName} initialTagLine={tagLine} />
+            <SummonerSearch initialGameName={gameName!} initialTagLine={tagLine!} initialRegionPlatform={regionPlatform!}/>
         </div>
     );
 };

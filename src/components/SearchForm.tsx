@@ -1,26 +1,27 @@
 // src/components/SearchForm.tsx
 import React, { useState } from 'react';
+import { PLATFORM_REGIONS_LIST, DISPLAY_REGIONS } from '../utils/constants';
 // 1. Definimos el Contrato: onSearch debe ser una función.
 interface SearchFormProps {
-  onSearch: (gameName: string, tagLine: string) => void; 
+  onSearch: (gameName: string, tagLine: string, regionPlat: string) => void; 
 }
 
 const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   // Estado local: Solo para controlar el input y lo que escribe el usuario
     const [gName, setGName] = useState('');
     const [tLine, setTLine] = useState('');
+    const [region, setRegion] = useState('LA2');
 
   // Lógica que se ejecuta al presionar "Buscar"
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // 🛑 Evita el comportamiento por defecto del formulario (recargar la página)
-    
+    e.preventDefault();
     const trimmedName = gName.trim();
     const trimmedTag = tLine.trim();
     
-    if (trimmedName && trimmedTag) {
+    if (trimmedName && trimmedTag && region) {
       // 🚀 FLUIDEZ DE ACCIÓN: Ejecuta el callback del padre (handleSearch)
       // Esto le dice al padre: "Aquí tienes el nombre, haz lo que tengas que hacer con él."
-      onSearch(trimmedName, trimmedTag); 
+      onSearch(trimmedName, trimmedTag, region); 
       
       // Opcional: Limpiar el input después de la búsqueda
       // setSummonerName(''); 
@@ -29,6 +30,17 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex space-x-2">
+      <select
+        value={region}
+        onChange={(e) => setRegion(e.target.value)}
+        className="p-3 border border-gray-300 rounded-lg"
+      >
+          {PLATFORM_REGIONS_LIST.map(platCode => (
+            <option key={platCode} value={platCode}>
+              {DISPLAY_REGIONS[platCode]}
+            </option>
+        ))}
+      </select>
       <input
         type="text"
         placeholder="Nombre de invocador... (Ej: Faker)"

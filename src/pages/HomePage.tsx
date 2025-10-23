@@ -7,10 +7,10 @@ import SearchForm from '../components/SearchForm';
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSearch = (gameName: string, tagLine: string) => {
+  const handleSearch = (gameName: string, tagLine: string, region: string) => {
     // 3. NAVEGACIÓN: Redirige al usuario a la nueva URL de perfil
     // Esto coincide con el patrón definido en App.tsx: /profile/:gameName/:tagLine
-    const profilePath = `/profile/${gameName}/${tagLine}`;
+    const profilePath = `/profile/${gameName}/${tagLine}/${region}`;
     navigate(profilePath);
   };
 
