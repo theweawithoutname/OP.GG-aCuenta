@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // ⬅️ useNavigate es crucial
-import SummonerSearch from '../components/SummonerSearch'; 
-import SearchForm from '../components/SearchForm'; // ⬅️ Importamos el formulario
+import SummonerSearch from '../features/summoner/SummonerSearch'; 
+import SearchForm from '../features/search/SearchForm'; // ⬅️ Importamos el formulario
 
 // (La interfaz RouteParams se mantiene aquí)
 interface RouteParams extends Record<string, string | undefined>{

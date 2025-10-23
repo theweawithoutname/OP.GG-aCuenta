@@ -1,5 +1,5 @@
 import React from 'react';
-import { type RankData } from '../types/api';
+import { type RankData } from '../../api/types/api';
 
 interface SummonerRankProps {
     ranks: RankData[];

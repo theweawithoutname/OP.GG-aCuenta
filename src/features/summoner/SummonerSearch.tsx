@@ -9,7 +9,7 @@
 
 */
 import React from 'react';
-import { useFetchSummoner } from '../hooks/useFetchSummoner';
+import { useFetchSummoner } from '../../api/hooks/useFetchSummoner';
 
 // Importaciones de Contratos (Componentes de Presentación que usaremos después)
 import SummonerProfile from './SummonerProfile';

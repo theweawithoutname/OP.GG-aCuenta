@@ -1,6 +1,6 @@
 // src/components/SearchForm.tsx
 import React, { useState } from 'react';
-import { PLATFORM_REGIONS_LIST, DISPLAY_REGIONS } from '../utils/constants';
+import { PLATFORM_REGIONS_LIST, DISPLAY_REGIONS } from '../../api/utils/constants';
 // 1. Definimos el Contrato: onSearch debe ser una función.
 interface SearchFormProps {
   onSearch: (gameName: string, tagLine: string, regionPlat: string) => void; 

@@ -5,7 +5,7 @@
 */
 
 import React from 'react';
-import {type SummonerIconProps } from '../types/props';
+import {type SummonerIconProps } from '../../api/types/props';
 
 
 const SummonerIcon: React.FC<SummonerIconProps> = ({ iconUrl, altText }) => {

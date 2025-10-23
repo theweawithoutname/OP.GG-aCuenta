@@ -2,7 +2,7 @@
 
 /* */
 
-import { type SummonerProfileProps } from '../types/props';
+import { type SummonerProfileProps } from '../../api/types/props';
 import React from 'react';
 import SummonerIcon from './SummonerIcon';
 import SummonerRank from './SummonerRank';

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import SearchForm from '../components/SearchForm';
+import SearchForm from '../features/search/SearchForm';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
