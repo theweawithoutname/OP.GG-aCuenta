@@ -13,7 +13,7 @@ import { useFetchSummoner } from '../../api/hooks/useFetchSummoner';
 
 // Importaciones de Contratos (Componentes de Presentación que usaremos después)
 import SummonerProfile from './SummonerProfile';
-import KataLoading from '../assets/KataLoading.gif'
+import KataLoading from '../../assets/KataLoading.gif'
 
 export interface SummonerSearchProps {
   initialGameName: string;
