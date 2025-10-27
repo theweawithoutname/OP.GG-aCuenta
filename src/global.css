@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+/* === A. PALETA NEUTRAL (El 60%) === */
+  /* Por defecto, definimos los colores de MODO CLARO */
+  --color-bg-default: #FFFFFF;     /* Fondo principal (Blanco) */
+  --color-bg-surface: #F4F4F5;    /* Fondo de cards (Gris claro) */
+  --color-border-color: #D4D4D8; /* Bordes y divisores */
+  --color-text-base: #18181B;    /* Texto principal (Casi negro) */
+  --color-text-muted: #52525B;   /* Texto secundario (Gris oscuro) */
+
+
+
+  /* === B. PALETA PRIMARIA (Tu Marca - El 30%) === */
+  /* Usaremos 'Cyan' de Tailwind, que es un turquesa digital perfecto */
+  --color-primary: #14B8A6;      /* teal-500 (Tu nuevo turquesa) */
+  --color-primary-hover: #0D9488; /* teal-600 (Hover más oscuro) */
+  --color-primary-text: #FFFFFF;  /* Texto sobre botones (sigue blanco) */
+  
+  /* === C. PALETA DE ACENTOS (Datos - El 10%) === */
+  /* Los colores semánticos para KDA, Victorias, etc. */
+  
+  /* Para "Victoria" o "Bueno" (Sube 🔺) */
+  /* Nota: Evitamos el verde porque compite con el turquesa. 
+     El 'Lime' es eléctrico y contrasta mejor. */
+  --color-accent-win: #A3E635;    /* lime-400 */
+  
+  /* Para "Derrota" o "Malo" (Baja 🔻) */
+  --color-accent-loss: #EF4444;   /* red-500 */
+  
+  /* Para "Destacado" (Rango S+, Legendario) */
+  --color-accent-rank: #FBBF24;   /* amber-400 (Dorado) */
+
+  /* === Tu "Pila" de Tipografía === */
+  /* Usando la pila de sistema nativa como placeholder */
+  --font-family-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-family-serif: ui-serif, Georgia, serif;
+  
+  /* Un alias para títulos */
+  --font-family-heading: var(--font-family-sans);
+
+
+/* 3. Sobrescribes los colores para MODO OSCURO */
+/* Esto se activa automáticamente si el OS del usuario está en modo oscuro */
+
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    /* Sobrescribimos solo los colores neutrales */
+  --color-bg-default: #18181B;   /* Fondo (Gris muy oscuro) */
+  --color-bg-surface: #27272A;  /* Fondo de cards (Gris oscuro) */
+  --color-border-color: #3F3F46; /* Bordes (Gris medio) */
+  --color-text-base: #F4F4F5;    /* Texto (Casi blanco) */
+  --color-text-muted: #A1A1AA;   /* Texto (Gris claro) */
+    }
+}

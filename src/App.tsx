@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-900 p-6 flex justify-center">
+    <div className="min-h-screen p-6 bg-bg-default flex justify-center">
       <Routes>
         <Route path="/" element={<HomePage />}/>
         <Route path="/profile/:gameName/:tagLine/:regionPlatform" element={<ProfilePage />}/>

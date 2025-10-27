@@ -16,7 +16,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen -mt-20">
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-8">
+      <h1 className="text-4xl font-extrabold text-text-base mb-8">
         Riot ID Stats Tracker
       </h1>
       <SearchForm onSearch={handleSearch} />
