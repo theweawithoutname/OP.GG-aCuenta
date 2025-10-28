@@ -3,6 +3,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import SearchForm from '../features/search/SearchForm';
+import Portada from '../assets/PortadaL.jpg'
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,9 +17,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen -mt-20">
-      <h1 className="text-4xl font-extrabold text-text-base mb-8">
-        Riot ID Stats Tracker
-      </h1>
+      <img src={Portada} alt="nerdyboy" className='mb-8' />
       <SearchForm onSearch={handleSearch} />
     </div>
   );

@@ -1,0 +1,2 @@
+types/api.ts : definimos las interfaces de datos
+utils/dataMappers : traducimos los datos de la API a datos que queremos (tambien ayuda a la mantencion en el futuro)

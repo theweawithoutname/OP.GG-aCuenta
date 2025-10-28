@@ -55,3 +55,26 @@
   --color-text-muted: #A1A1AA;   /* Texto (Gris claro) */
     }
 }
+
+/* 1. El scrollbar en sí (el "cuerpo") */
+::-webkit-scrollbar {
+  width: 8px;  /* Ancho para scroll vertical */
+  height: 8px; /* Alto para scroll horizontal */
+}
+
+/* 2. El riel (la "pista" por donde se mueve) */
+::-webkit-scrollbar-track {
+  background: var(--color-bg-surface); /* Color del riel (usando tu variable) */
+}
+
+/* 3. El "pulgar" (la parte que arrastras) */
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary); /* Color del pulgar (usando tu variable) */
+  border-radius: 10px;
+  border: 2px solid var(--color-bg-surface); /* Crea un pequeño borde */
+}
+
+/* 4. El "pulgar" al pasar el ratón */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-hover); /* Color al hacer hover (usando tu variable) */
+}
