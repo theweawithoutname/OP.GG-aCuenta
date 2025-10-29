@@ -29,10 +29,10 @@ const ProfilePage: React.FC = () => {
     }
 
     return (
-        <div className="w-full max-w-4xl p-4 mt-10">
+        <div className="w-full bg-bg-surface max-w-4xl p-4 mt-10">
             
             {/* 🛑 NUEVA POSICIÓN: El SearchForm va arriba de la página de perfil */}
-            <header className="mb-8 p-4 bg-white shadow rounded-lg">
+            <header className="mb-8 p-4 bg-bg-default shadow rounded-lg">
                <SearchForm onSearch={handleNewSearch} /> 
             </header>
             

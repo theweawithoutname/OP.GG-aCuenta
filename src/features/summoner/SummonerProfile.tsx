@@ -11,17 +11,17 @@ import SummonerRank from './SummonerRank';
 
 const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
   return (
-    <div className="p-6">
+    <div className="p-6 bg-bg-default rounded-lg">
       
       {/* 1. SECCIÓN PRINCIPAL DE PERFIL */}
-      <div className="flex items-center space-x-4 p-4 border rounded-lg bg-white shadow-md">
+      <div className="flex items-center space-x-4 p-4 rounded-lg bg-bg-surface">
         <SummonerIcon 
           iconUrl={data.profileIconUrl} 
           altText={`Icono de perfil de ${data.name}`} 
         />
         <div>
-          <h2 className="text-3xl font-extrabold text-gray-800">{data.name}</h2>
-          <p className="text-gray-500">Nivel: {data.level}</p>
+          <h2 className="text-3xl font-extrabold text-text-base">{data.name}</h2>
+          <p className="text-text-base">Nivel: {data.level}</p>
         </div>
       </div>
       

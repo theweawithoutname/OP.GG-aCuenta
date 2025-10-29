@@ -26,7 +26,7 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({initialGameName, initial
   const fetchState = useFetchSummoner(initialGameName, initialTagLine, initialRegionPlatform);
 
   return (
-    <div className="p-8 max-w-lg mx-auto">
+    <div className="p-8 max-w-lg mx-auto rounded-lg">
 
       {/* 🟡 RENDERIZADO CONDICIONAL: Muestra un mensaje mientras carga */}
       {fetchState.loading && 
@@ -36,7 +36,7 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({initialGameName, initial
 
       {/* 🟢 CONTRATO ABAJO: Pasa los datos limpios al hijo (SummonerProfile) */}
       {fetchState.data && (
-        <div className="mt-6">
+        <div className="mt-6 rounded-lg">
           <SummonerProfile data={fetchState.data} /> 
         </div>
       )}

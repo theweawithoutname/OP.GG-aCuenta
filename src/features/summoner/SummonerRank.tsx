@@ -17,16 +17,18 @@ const SummonerRank: React.FC<SummonerRankProps> = ({ ranks }) => {
     const tierIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${tier.toLowerCase()}.png`;
 
     return (
-    <div className="flex items-center space-x-4 p-4 mt-4 bg-gray-50 border rounded-lg">
+    <div className="flex items-center space-x-4 p-4 mt-4 bg-bg-surface rounded-lg">
+      <div className='h-24 w-24 overflow-hidden'>
       <img
         src={tierIconUrl}
         alt={`${tier} ${rank}`}
-        className="w-16 h-16"
+        className="w-full h-full pt-0.5 object-cover scale-300"
       />
-      <div>
-        <p className="font-semibold text-lg">{tier} {rank}</p>
-        <p className="text-sm text-gray-600">{leaguePoints} LP</p>
-        <p className="text-xs text-gray-400">Victorias: {wins} / Derrotas: {losses}</p>
+      </div>
+      <div className='ml-0.5 pl-0.5'>
+        <p className="font-semibold text-lg text-text-base">{tier} {rank}</p>
+        <p className="text-sm text-text-base">{leaguePoints} LP</p>
+        <p className="text-xs text-text-base">Victorias: {wins} / Derrotas: {losses}</p>
       </div>
     </div>
   );
