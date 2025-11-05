@@ -6,6 +6,7 @@ import { type SummonerProfileProps } from '../../api/types/props';
 import React from 'react';
 import SummonerIcon from './SummonerIcon';
 import SummonerRank from './SummonerRank';
+import MatchHistoryList from './MatchHistoryList';
 
 // Asumimos que esta interfaz ya está definida en otro archivo.
 
@@ -26,7 +27,9 @@ const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
       </div>
       
       {/* 2. SECCIÓN DE RANGO */}
-      <SummonerRank ranks={data.ranks} /> {/* 🛑 NUEVO USO DE COMPONENTE */}
+      <SummonerRank ranks={data.ranks || []} /> {/* 🛑 NUEVO USO DE COMPONENTE */}
+
+      <MatchHistoryList matches={data.matchHistory || []} />
 
     </div>
   );

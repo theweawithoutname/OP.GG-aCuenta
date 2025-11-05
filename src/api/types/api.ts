@@ -28,6 +28,48 @@ export interface RankData {
   wins: number;
   losses: number;
 }
+
+export interface MatchData {
+  matchId: string;
+  gameDuration: number; // Duración en segundos
+  queueId: number;      // Tipo de cola (ej: 420 para SoloQ)
+  championName: string; // Campeón jugado
+  win: boolean;         // Resultado: Ganó (true) o Perdió (false)
+  kills: number;
+  deaths: number;
+  assists: number;
+  kda: string;          // Ratio KDA (lo calcularemos en el mapeador)
+  items: number[];      // Array de IDs de ítems comprados
+}
+
+export interface MatchHistoryData {
+  matches: MatchData[]; // Un array de las partidas individuales
+}
+
+export interface RiotMatchDetailResponse {
+  info: {
+    gameDuration: number;
+    queueId: number;
+    participants: {
+      puuid: string;
+      championName: string;
+      win: boolean;
+      kills: number;
+      deaths: number;
+      assists: number;
+      item0: number;
+      item1: number;
+      item2: number;
+      item3: number;
+      item4: number;
+      item5: number;
+      item6: number;
+    }[];
+  };
+  metadata: {
+    matchId: string;
+  };
+}
 /**
  * Define la respuesta mínima esperada de la API de Riot (ej: /summoner/v4/...).
  */
@@ -36,6 +78,7 @@ export interface SummonerData {
   level: number;
   profileIconUrl: string;
   ranks: RankData[];
+  matchHistory: MatchData[];
 }
 
 /**
