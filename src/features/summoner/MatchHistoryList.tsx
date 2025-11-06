@@ -9,22 +9,26 @@ interface MatchHistoryListProps {
 const MatchHistoryList: React.FC<MatchHistoryListProps> = ({ matches }) => {
   if (matches.length === 0) {
     return (
-      <p className="mt-8 text-gray-500 italic">
-        No se encontraron partidas recientes en el historial.
-      </p>
+      <div className="mt-8 p-4 bg-bg-surface rounded-lg">
+        <p className="text-text-muted italic text-center">
+          No se encontraron partidas recientes en el historial.
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-4 border-b pb-2">Historial de Partidas ({matches.length})</h2>
+      {/* --- Título actualizado con colores del tema --- */}
+      <h2 className="text-2xl font-bold mb-4 border-b-2 border-border-color pb-2 text-text-base">
+        Historial de Partidas ({matches.length})
+      </h2>
       
       <div className="space-y-3">
-        {/* 🚀 Iteración sobre el array de partidas limpias */}
         {matches.map(match => (
           <MatchHistoryItem 
-            key={match.matchId} // Clave única para la lista
-            match={match}       // Pasa el objeto MatchData completo al hijo
+            key={match.matchId}
+            match={match}
           />
         ))}
       </div>
