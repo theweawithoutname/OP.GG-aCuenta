@@ -50,7 +50,7 @@ const fetchRank = async (puuid: string, apiKey: string, leagueUrlBase: string): 
 // ------------------------------------------------------------------
 
 const mapToMatchData = (matchDetail: RiotMatchDetailResponse, puuid: string): MatchData | null => {
-    const participant = matchDetail.info.participants.find((p: RiotMatchDetailResponse['info']['participants'][0]) => p.puuid.toLowerCase() === puuid.toLowerCase());
+    const participant = matchDetail.info.participants.find((p: RiotMatchDetailResponse['info']['participants'][0]) => p.puuid === puuid);
 
     if (!participant) {
         console.warn(`PUUID no encontrado en la partida ${matchDetail.metadata.matchId}.`);
@@ -81,21 +81,19 @@ const mapToMatchData = (matchDetail: RiotMatchDetailResponse, puuid: string): Ma
 
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-const fetchMatchHistory = async (puuid: string, apiKey: string,): Promise<MatchData[]> => {
+const fetchMatchHistory = async (puuid: string, apiKey: string, regionGlobal: string): Promise<MatchData[]> => {
 
     // Se usan las URLs regionales (americas, europe, etc.) para Match-V5
-    const MATCH_IDS_URL = `/api/riot/lol/match/v5/matches/by-puuid/`;
-    const MATCH_DETAIL_URL = `/api/riot/lol/match/v5/matches/`;
+    const MATCH_IDS_URL = `https://${regionGlobal}.api.riotgames.com/lol/match/v5/matches/by-puuid/`;
+    const MATCH_DETAIL_URL = `https://${regionGlobal}.api.riotgames.com/lol/match/v5/matches/`;
 
     // -----------------------------------------------------
     // PASO A: Obtener la lista de IDs de partidas (esto no cambia)
     // -----------------------------------------------------
-    const cacheBust = `&_t=${new Date().getTime()}`;
-    const matchIdsFetchUrl = `${MATCH_IDS_URL}${puuid}/ids?api_key=${apiKey}${cacheBust}`;
+
+    const matchIdsFetchUrl = `${MATCH_IDS_URL}${puuid}/ids?count=2&api_key=${apiKey}`;
     
-    const idResponse = await fetch(matchIdsFetchUrl, {cache: 'no-store'});
+    const idResponse = await fetch(matchIdsFetchUrl);
     if (!idResponse.ok) {
         if (idResponse.status === 404) return []; 
         throw new Error(`Error al obtener lista de IDs de partidas: ${idResponse.status}`);
@@ -105,9 +103,7 @@ const fetchMatchHistory = async (puuid: string, apiKey: string,): Promise<MatchD
     if (matchIds.length === 0) return []; 
 
     
-    const matchDetails = []; // Array para guardar los resultados
-
-    // Se usa 'for...of' para que 'await' funcione dentro del bucle
+    const matchDetails = [];
     for (const matchId of matchIds) {
         const detailResponse = await fetch(`${MATCH_DETAIL_URL}${matchId}?api_key=${apiKey}`);
         
@@ -115,13 +111,8 @@ const fetchMatchHistory = async (puuid: string, apiKey: string,): Promise<MatchD
             const detailJson = await detailResponse.json();
             matchDetails.push(detailJson);
         } else {
-            // Si una partida falla (ej. 429), la saltamos y continuamos
             console.warn(`No se pudo cargar el detalle de la partida ${matchId}: ${detailResponse.status}`);
         }
-
-        // ⏳ PAUSA OBLIGATORIA: Esperamos 100ms antes de la siguiente solicitud
-        // Esto evita superar el límite de 20 solicitudes/segundo
-        await delay(100); 
     }
 
     const mappedMatches = matchDetails.map(detail => mapToMatchData(detail, puuid));
@@ -135,13 +126,9 @@ const fetchMatchHistory = async (puuid: string, apiKey: string,): Promise<MatchD
 export const useFetchSummoner = (gameName: string, tagLine: string, regionPlatform: string): FetchState<SummonerData> => {
 
     const regionGlobal = PLATFORM_REGIONS[regionPlatform] || 'americas';
-    // 🛑 CAMBIO CLAVE: Las URLs ahora son relativas y apuntan al proxy
-    const ACCOUNT_V1_URL = `/api/riot/riot/account/v1/accounts/by-riot-id/`;
-
-    // 🛑 CAMBIO CLAVE: Usamos la URL base de la plataforma
-    // (Ajusta la URL de SUMMONER y LEAGUE si usan diferentes regiones base)
-    const SUMMONER_V4_URL = `/api/platform/lol/summoner/v4/summoners/by-puuid/`;
-    const LEAGUE_V4_URL = `/api/platform/lol/league/v4/entries/by-puuid/`;
+    const ACCOUNT_V1_URL = `https://${regionGlobal}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/`;
+    const SUMMONER_V4_URL = `https://${regionPlatform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
+    const LEAGUE_V4_URL = `https://${regionPlatform}.api.riotgames.com/lol/league/v4/entries/by-puuid/`;
 
     
     
@@ -170,7 +157,7 @@ export const useFetchSummoner = (gameName: string, tagLine: string, regionPlatfo
                     fetchRank(puuid, apiKey, LEAGUE_V4_URL)
                 ]);
 
-                const matchHistoryData = await fetchMatchHistory(puuid, apiKey);
+                const matchHistoryData = await fetchMatchHistory(puuid, apiKey, regionGlobal);
                 
                 // traduce los datos y los muestra
                 const transformedData = mapRiotToSummonerData(rawProfileData, rawRankData, matchHistoryData); 
