@@ -1,5 +1,7 @@
 import React from 'react';
 import { type MatchData } from '../../api/types/api'; 
+import ItemIcon from './ItemIcon';
+import ChampionIcon from './ChampionIcon';
 
 interface MatchHistoryItemProps {
   match: MatchData;
@@ -7,10 +9,9 @@ interface MatchHistoryItemProps {
 
 const MatchHistoryItem: React.FC<MatchHistoryItemProps> = ({ match }) => {
   
-  // --- Lógica de clases actualizada para usar tu paleta de acentos ---
   const resultBorderClass = match.win 
-    ? 'border-accent-win'   // Usa tu variable CSS --color-accent-win
-    : 'border-accent-loss'; // Usa tu variable CSS --color-accent-loss
+    ? 'border-accent-win' 
+    : 'border-accent-loss';
 
   const resultTextClass = match.win
     ? 'text-accent-win'
@@ -23,50 +24,59 @@ const MatchHistoryItem: React.FC<MatchHistoryItemProps> = ({ match }) => {
   };
 
   return (
-    // --- Contenedor principal actualizado ---
+    // --- Contenedor Principal (GRID de 4 Columnas) ---
     <div className={`
-      p-4 flex items-center justify-between 
+      p-4 
       bg-bg-surface rounded-lg 
       border-l-4 ${resultBorderClass} 
       shadow-lg
-    `}>
       
-      {/* Columna 1: Campeón y Resultado */}
-      <div className="flex items-center space-x-3">
-        {/* 💡 Aquí iría la imagen del campeón */}
-
-        {/* --- Texto de Resultado actualizado --- */}
-        <div className={`font-bold text-lg w-24 ${resultTextClass}`}>
-            {match.win ? 'VICTORIA' : 'DERROTA'}
-        </div>
-        
-        {/* --- Textos de Info actualizados --- */}
-        <div className="text-text-base">
-          <p className="font-semibold">{match.championName}</p>
+      grid grid-cols-[100px_140px_100px_1fr] gap-x-4 items-center
+    `}>
+      {/* Definición de las columnas:
+        - Col 1 (Resultado): 100px
+        - Col 2 (Info Champ): 140px
+        - Col 3 (KDA): 100px
+        - Col 4 (Items): 1fr (ocupa todo el espacio sobrante)
+      */}
+      
+      {/* --- Columna 1: Resultado --- */}
+      <div className={`font-bold text-lg ${resultTextClass}`}>
+        {match.win ? 'VICTORIA' : 'DERROTA'}
+      </div>
+      
+      {/* --- Columna 2: Info de Partida --- */}
+      <div className="flex items-center space-x-2 text-text-base"> {/* Usamos flex para el ícono y texto */}
+        <ChampionIcon 
+          iconUrl={match.championIconUrl} 
+          altText={match.championName} 
+          size="medium" // Puedes ajustar el tamaño aquí
+        />
+        <div> {/* Este div contendrá el KDA y la duración */}
+          <p className="font-semibold whitespace-nowrap">{match.kda}</p> {/* Mueve el KDA aquí */}
           <p className="text-sm text-text-muted">
-            {/* TODO: Mapear queueId a un nombre (Ej: "Ranked Solo") */}
             {match.queueId} - {formatDuration(match.gameDuration)}
           </p>
         </div>
       </div>
       
-      {/* Columna 2: KDA (Textos actualizados) */}
+      {/* --- Columna 3: KDA --- */}
       <div className="text-center">
-        <p className="font-mono text-text-base">{match.kda}</p>
+        <p className="font-mono text-text-base whitespace-nowrap">{match.kda}</p>
         <p className="text-xs text-text-muted">{match.kills}/{match.deaths}/{match.assists}</p>
       </div>
 
-      {/* Columna 3: Ítems (Placeholder actualizado) */}
-      <div className="flex space-x-1">
-        {/* Corregido el map: usamos '_' para el item que no usamos y 'index' para la key */}
-        {match.items.map((_, index) => (
-            <div 
-              key={index} 
-              // --- Placeholder usa 'bg-bg-default' (el fondo de la página) ---
-              className="w-6 h-6 bg-bg-default rounded"
-            >
-                {/* Aquí iría la <img> del ítem */}
-            </div>
+      {/* --- Columna 4: Ítems (GRID de 7 Columnas) --- */}
+      {/* Usamos 'grid-cols-7' para forzar 7 columnas para los 7 ítems.
+        'justify-end' alinea toda la cuadrícula de ítems a la derecha.
+      */}
+      <div className="grid grid-cols-7 gap-0.5 justify-end">
+        {match.items.map((itemUrl, index) => (
+          <ItemIcon 
+            key={index}
+            iconUrl={itemUrl}
+            altText={`Ítem ${index + 1}`}
+          />
         ))}
       </div>
 

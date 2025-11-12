@@ -13,7 +13,7 @@ const SummonerIcon: React.FC<SummonerIconProps> = ({ iconUrl, altText }) => {
     <img 
       src={iconUrl} 
       alt={altText}
-      className="w-20 h-20 rounded-full border-4 border-yellow-500 shadow-lg object-cover"
+      className="w-20 h-20 rounded-full border-4 border-primary shadow-lg object-cover"
     />
   );
 };

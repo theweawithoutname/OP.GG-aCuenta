@@ -1,6 +1,6 @@
 import { useState, useEffect} from 'react';
-import type { FetchState, RankData, SummonerData, MatchData, RiotSummonerResponse, RiotMatchDetailResponse } from '../types/api';
-import { mapRiotToSummonerData } from '../utils/dataMappers';
+import type { FetchState, RankData, SummonerData, MatchData, RiotSummonerResponse } from '../types/api';
+import { mapRiotToSummonerData, mapToMatchData } from '../utils/dataMappers';
 import { PLATFORM_REGIONS } from '../utils/constants';
 
 
@@ -49,37 +49,6 @@ const fetchRank = async (puuid: string, apiKey: string, leagueUrlBase: string): 
 };
 // ------------------------------------------------------------------
 
-const mapToMatchData = (matchDetail: RiotMatchDetailResponse, puuid: string): MatchData | null => {
-    const participant = matchDetail.info.participants.find((p: RiotMatchDetailResponse['info']['participants'][0]) => p.puuid === puuid);
-
-    if (!participant) {
-        console.warn(`PUUID no encontrado en la partida ${matchDetail.metadata.matchId}.`);
-        return null;
-    }
-
-    const kda = `${participant.kills}/${participant.deaths}/${participant.assists}`;
-
-    const items = [
-        participant.item0, participant.item1, participant.item2,
-        participant.item3, participant.item4, participant.item5, participant.item6
-    ];
-
-    const validItems = items.filter((id: number) => id !== 0);
-
-    return {
-        matchId: matchDetail.metadata.matchId,
-        gameDuration: matchDetail.info.gameDuration,
-        queueId: matchDetail.info.queueId,
-        championName: participant.championName,
-        win: participant.win,
-        kills: participant.kills,
-        deaths: participant.deaths,
-        assists: participant.assists,
-        kda: kda,
-        items: validItems,
-    }
-
-}
 
 const fetchMatchHistory = async (puuid: string, apiKey: string, regionGlobal: string): Promise<MatchData[]> => {
 
@@ -160,7 +129,9 @@ export const useFetchSummoner = (gameName: string, tagLine: string, regionPlatfo
                 const matchHistoryData = await fetchMatchHistory(puuid, apiKey, regionGlobal);
                 
                 // traduce los datos y los muestra
-                const transformedData = mapRiotToSummonerData(rawProfileData, rawRankData, matchHistoryData); 
+                const transformedData = mapRiotToSummonerData(rawProfileData, rawRankData, matchHistoryData, gameName); 
+
+                transformedData.name = gameName;
 
                 setFetchState({ data: transformedData, loading: false, error: null });
 

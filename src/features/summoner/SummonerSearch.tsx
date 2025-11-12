@@ -26,7 +26,7 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({initialGameName, initial
   const fetchState = useFetchSummoner(initialGameName, initialTagLine, initialRegionPlatform);
 
   return (
-    <div className="p-8 max-w-lg mx-auto rounded-lg">
+    <div className="p-8">
 
       {/* 🟡 RENDERIZADO CONDICIONAL: Muestra un mensaje mientras carga */}
       {fetchState.loading && 

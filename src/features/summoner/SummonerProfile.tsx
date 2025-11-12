@@ -20,8 +20,8 @@ const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
           iconUrl={data.profileIconUrl} 
           altText={`Icono de perfil de ${data.name}`} 
         />
-        <div>
-          <h2 className="text-3xl font-extrabold text-text-base">{data.name}</h2>
+        <div className='px-1.5'>
+          <h2 className="text-[24px] font-extrabold text-text-base">{data.name}</h2>
           <p className="text-text-base">Nivel: {data.level}</p>
         </div>
       </div>
