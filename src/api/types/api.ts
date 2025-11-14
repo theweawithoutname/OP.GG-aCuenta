@@ -33,13 +33,14 @@ export interface MatchData {
   matchId: string;
   gameDuration: number; // Duración en segundos
   queueId: number;      // Tipo de cola (ej: 420 para SoloQ)
-  championName: string; // Campeón jugado
+  championName: string; 
+  championIconUrl: string;// Campeón jugado
   win: boolean;         // Resultado: Ganó (true) o Perdió (false)
   kills: number;
   deaths: number;
   assists: number;
   kda: string;          // Ratio KDA (lo calcularemos en el mapeador)
-  items: number[];      // Array de IDs de ítems comprados
+  items: string[];      // Array de IDs de ítems comprados
 }
 
 export interface MatchHistoryData {

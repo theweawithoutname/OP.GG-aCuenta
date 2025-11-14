@@ -11,15 +11,6 @@ import type {
 const DDRAGON_VERSION = '14.20.1'; // Asegúrate de actualizar la versión
 
 function getDDragonChampionId(apiName: string): string {
-  const lowerApiName = apiName.toLowerCase();
-
-  if (lowerApiName === "nautilus") {
-    return "Nautilus";
-  }
-
-  if (lowerApiName === "seraphine") {
-    return "Seraphine";
-  }
 
   return apiName.replace(/[^a-zA-Z0-9]/g, '');
 }
