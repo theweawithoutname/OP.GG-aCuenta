@@ -129,7 +129,7 @@ export const useFetchSummoner = (gameName: string, tagLine: string, regionPlatfo
                 const matchHistoryData = await fetchMatchHistory(puuid, apiKey, regionGlobal);
                 
                 // traduce los datos y los muestra
-                const transformedData = mapRiotToSummonerData(rawProfileData, rawRankData, matchHistoryData, gameName); 
+                const transformedData = mapRiotToSummonerData(rawProfileData, rawRankData, matchHistoryData, gameName, tagLine); 
 
                 transformedData.name = gameName;
 

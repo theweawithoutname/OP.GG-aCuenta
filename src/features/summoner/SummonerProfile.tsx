@@ -1,14 +1,11 @@
-// SummonerProfile.tsx (fragmento)
 
-/* */
 
 import { type SummonerProfileProps } from '../../api/types/props';
 import React from 'react';
-import SummonerIcon from './SummonerIcon';
+import SummonerIcon from '../icons/SummonerIcon';
 import SummonerRank from './SummonerRank';
 import MatchHistoryList from './MatchHistoryList';
 
-// Asumimos que esta interfaz ya está definida en otro archivo.
 
 const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
   return (
@@ -21,13 +18,15 @@ const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
           altText={`Icono de perfil de ${data.name}`} 
         />
         <div className='px-1.5'>
-          <h2 className="text-[24px] font-extrabold text-text-base">{data.name}</h2>
+          <h2 className="text-[24px] font-extrabold text-text-base">{data.name}
+            <span className="text-text-muted font-normal text-lg ml-1">#{data.tagLine}</span>
+          </h2> 
           <p className="text-text-base">Nivel: {data.level}</p>
         </div>
       </div>
       
       {/* 2. SECCIÓN DE RANGO */}
-      <SummonerRank ranks={data.ranks || []} /> {/* 🛑 NUEVO USO DE COMPONENTE */}
+      <SummonerRank ranks={data.ranks || []} />
 
       <MatchHistoryList matches={data.matchHistory || []} />
 

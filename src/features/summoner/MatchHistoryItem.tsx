@@ -1,7 +1,8 @@
 import React from 'react';
 import { type MatchData } from '../../api/types/api'; 
-import ItemIcon from './ItemIcon';
-import ChampionIcon from './ChampionIcon';
+import ItemIcon from '../icons/ItemIcon';
+import ChampionIcon from '../icons/ChampionIcon';
+import { QUEUE_ID_TO_NAME } from '../../api/utils/constants';
 
 interface MatchHistoryItemProps {
   match: MatchData;
@@ -22,6 +23,8 @@ const MatchHistoryItem: React.FC<MatchHistoryItemProps> = ({ match }) => {
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
+
+  const queueName = QUEUE_ID_TO_NAME[match.queueId] || `Cola ${match.queueId}`;
 
   return (
     // --- Contenedor Principal (GRID de 4 Columnas) ---
@@ -50,12 +53,12 @@ const MatchHistoryItem: React.FC<MatchHistoryItemProps> = ({ match }) => {
         <ChampionIcon 
           iconUrl={match.championIconUrl} 
           altText={match.championName} 
-          size="medium" // Puedes ajustar el tamaño aquí
+          size="large" // Puedes ajustar el tamaño aquí
         />
         <div> {/* Este div contendrá el KDA y la duración */}
           <p className="font-semibold whitespace-nowrap">{match.kda}</p> {/* Mueve el KDA aquí */}
           <p className="text-sm text-text-muted">
-            {match.queueId} - {formatDuration(match.gameDuration)}
+            {queueName} - {formatDuration(match.gameDuration)}
           </p>
         </div>
       </div>

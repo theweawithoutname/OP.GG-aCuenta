@@ -36,5 +36,17 @@ export const DISPLAY_REGIONS: Record<string, string> = {
     'JP1': 'Japón',
 };
 
+export const QUEUE_ID_TO_NAME: Record<number, string> = {
+  420: 'Ranked Solo/Duo',
+  440: 'Ranked Flex',
+  400: 'Normal Draft',
+  430: 'Normal Blind',
+  450: 'ARAM',
+  490: 'Quickplay',
+  700: 'Clash',
+  1700: 'Arena',
+  1900: 'URF',
+};
+
 // Lista simple de plataformas disponibles para el menú desplegable
 export const PLATFORM_REGIONS_LIST: string[] = Object.keys(DISPLAY_REGIONS);

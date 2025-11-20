@@ -76,6 +76,7 @@ export interface RiotMatchDetailResponse {
  */
 export interface SummonerData {
   name: string;
+  tagLine: string;
   level: number;
   profileIconUrl: string;
   ranks: RankData[];

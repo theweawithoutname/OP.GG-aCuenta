@@ -78,3 +78,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-hover); /* Color al hacer hover (usando tu variable) */
 }
+
+/* 5. LA SOLUCIÓN: La esquina donde se cruzan */
+::-webkit-scrollbar-corner {
+  background-color: var(--color-bg-surface); 
+}

@@ -20,14 +20,16 @@ export function mapRiotToSummonerData(
   riotProfileData: RiotSummonerResponse, 
   rawRankData: RankData[],
   rawMatchHistory: MatchData[],
-  gameName: string // ⬅️ ACEPTA EL gameName
+  gameName: string,
+  tagLine: string
 ): SummonerData {
   
   const profileIconUrl = 
     `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/profileicon/${riotProfileData.profileIconId}.png`;
 
   return {
-    name: gameName, // ⬅️ ¡USA EL gameName!
+    name: gameName,
+    tagLine: tagLine,
     level: riotProfileData.summonerLevel,
     profileIconUrl: profileIconUrl,
     ranks: rawRankData,
