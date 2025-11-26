@@ -33,22 +33,12 @@ const ProfilePage: React.FC = () => {
                 bg-bg-default                   /* Tu color de fondo de tema */
                 shadow-lg                       /* Sombra para separarlo */
             ">
-                {/* Contenedor interno que se alinea con tu contenido 'max-w-4xl' */}
-                <div className="w-full max-w-4xl">
+                <div className="w-full max-w-7xl flex justify-center">
                     <SearchForm onSearch={handleNewSearch} /> 
                 </div>
             </header>
-            
-            {/* 2. CONTENIDO DE LA PÁGINA (Empujado hacia abajo) */}
-            {/* Este div envuelve tu contenido y le da 'padding-top' para
-                que no quede oculto detrás del navbar fijo.
-                'pt-28' (112px) es un buen valor para un navbar con 'p-4' (ajusta si es necesario).
-            */}
-            <main className="w-full max-w-4xl mx-auto px-4 pt-28">
-                {/* El 'bg-bg-surface' y 'p-4' que tenías en el div principal
-                    ahora los aplicamos aquí, al contenedor del contenido.
-                */}
-                <div className="bg-bg-surface p-4 rounded-lg">
+            <main className="w-full max-w-7xl mx-auto px-4">
+                <div className="bg-bg-surface p-4 pb-0 pt-28 min-h-full">
                     <SummonerSearch 
                         initialGameName={gameName!} 
                         initialTagLine={tagLine!} 

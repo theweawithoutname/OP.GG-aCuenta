@@ -9,7 +9,7 @@ import HomePage from './pages/HomePage';
 const App: React.FC = () => {
   return (
     <div className="
-            min-h-screen min-w-screen p-6 bg-bg-default flex justify-center         
+            min-h-screen   bg-bg-default flex justify-center         
             scrollbar-thin
             scrollbar-thumb-primary 
             scrollbar-track-bg-surface">
