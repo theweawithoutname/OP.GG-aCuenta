@@ -3,7 +3,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import SearchForm from '../features/search/SearchForm';
-import Portada from '../assets/teemo.png'
+import Portada from '../assets/Portada.svg'
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen -mt-20">
-      <img src={Portada} alt="teemo" className='h-64 w-64 mb-16' />
+      <img src={Portada} alt="teemo" className='mb-12' />
       <SearchForm onSearch={handleSearch} />
     </div>
   );
