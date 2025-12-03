@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useCallback} from 'react';
 import type { FetchState, RankData, SummonerData, MatchData, RiotSummonerResponse } from '../types/api';
 import { mapRiotToSummonerData, mapToMatchData } from '../utils/dataMappers';
 import { PLATFORM_REGIONS } from '../utils/constants';
@@ -99,99 +99,96 @@ export const useFetchSummoner = (gameName: string, tagLine: string, regionPlatfo
     const SUMMONER_V4_URL = `https://${regionPlatform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
     const LEAGUE_V4_URL = `https://${regionPlatform}.api.riotgames.com/lol/league/v4/entries/by-puuid/`;
 
-    // 1. ESTADO PRINCIPAL
+    // 1. ESTADOS
     const [fetchState, setFetchState] = useState<FetchState<SummonerData>>({
         data: null,
         loading: false,
         error: null,
     });
 
-    // 2. NUEVOS ESTADOS PARA PAGINACIÓN
-    // Guardamos el PUUID y la Región para no tener que volver a pedirlos al cargar más
     const [accountInfo, setAccountInfo] = useState<{puuid: string, regionGlobal: string} | null>(null);
-    // Controlamos cuántas partidas llevamos cargadas (Empezamos con 0)
     const [matchStartIndex, setMatchStartIndex] = useState(0); 
+    
+    // Estados visuales de carga
+    const [isUpdating, setIsUpdating] = useState(false);      // Para el botón de refresh
+    const [isLoadingMore, setIsLoadingMore] = useState(false); // Para el botón de "Cargar más"
 
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    // 3. EFECTO DE CARGA INICIAL
+    // 2. FUNCIÓN DE CARGA PRINCIPAL (Reutilizable)
+    const fetchData = useCallback(async (isManualUpdate = false) => {
+        // Si es manual, activamos isUpdating. Si es carga inicial, activamos loading general.
+        if (isManualUpdate) {
+            setIsUpdating(true);
+        } else {
+            setFetchState(prev => ({ ...prev, loading: true, error: null }));
+        }
+
+        const apiKey = import.meta.env.VITE_RIOT_API_KEY; 
+        const INITIAL_COUNT = 5;
+
+        try {
+            const puuid = await fetchPuuid(gameName, tagLine, apiKey, ACCOUNT_V1_URL);
+            
+            // Guardamos info y REINICIAMOS el índice de partidas
+            setAccountInfo({ puuid, regionGlobal });
+            setMatchStartIndex(INITIAL_COUNT); 
+
+            const [rawProfileData, rawRankData] = await Promise.all([
+                fetchProfile(puuid, apiKey, SUMMONER_V4_URL),
+                fetchRank(puuid, apiKey, LEAGUE_V4_URL)
+            ]);
+
+            const matchHistoryData = await fetchMatchHistory(puuid, apiKey, regionGlobal, 0, INITIAL_COUNT);
+            
+            const transformedData = mapRiotToSummonerData(
+                rawProfileData, 
+                rawRankData, 
+                matchHistoryData, 
+                gameName, 
+                tagLine
+            ); 
+
+            setFetchState({ data: transformedData, loading: false, error: null });
+
+        } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : 'Error desconocido.';
+            setFetchState(prev => ({ ...prev, error: errorMessage }));
+        } finally {
+            setFetchState(prev => ({ ...prev, loading: false }));
+            setIsUpdating(false);
+        }
+    }, [gameName, tagLine, ACCOUNT_V1_URL, SUMMONER_V4_URL, LEAGUE_V4_URL, regionGlobal]);
+
+
+    // 3. EFECTO: Ejecutar al montar o cambiar props
     useEffect(() => {
-        if (!gameName || !tagLine) return; 
-
-        const fetchSummoner = async () => {
-            setFetchState({ data: null, loading: true, error: null });
-            const apiKey = import.meta.env.VITE_RIOT_API_KEY; 
-            const INITIAL_COUNT = 5; // Cuantas partidas cargamos al principio
-
-            try {
-                // A. Obtener PUUID
-                const puuid = await fetchPuuid(gameName, tagLine, apiKey, ACCOUNT_V1_URL);
-                
-                // --- GUARDAMOS INFO PARA EL BOTÓN "CARGAR MÁS" ---
-                setAccountInfo({ puuid, regionGlobal });
-                setMatchStartIndex(INITIAL_COUNT); // La próxima vez empezaremos desde la 5
-                // --------------------------------------------------
-
-                // B. Obtener Perfil y Rango en paralelo
-                const [rawProfileData, rawRankData] = await Promise.all([
-                    fetchProfile(puuid, apiKey, SUMMONER_V4_URL),
-                    fetchRank(puuid, apiKey, LEAGUE_V4_URL)
-                ]);
-
-                // C. Obtener Historial Inicial (0 a 5)
-                // Nota: Asegúrate de actualizar fetchMatchHistory para recibir (start, count)
-                const matchHistoryData = await fetchMatchHistory(puuid, apiKey, regionGlobal, 0, INITIAL_COUNT);
-                
-                // D. Mapear Datos
-                const transformedData = mapRiotToSummonerData(
-                    rawProfileData, 
-                    rawRankData, 
-                    matchHistoryData, 
-                    gameName, 
-                    tagLine
-                ); 
-
-                // (Ya no necesitamos el parche .name = gameName porque lo pasamos arriba)
-
-                setFetchState({ data: transformedData, loading: false, error: null });
-
-            } catch (e) {
-                const errorMessage = e instanceof Error ? e.message : 'Error de red desconocido.';
-                setFetchState({ data: null, loading: false, error: errorMessage });
-            }
-        };
-
-        fetchSummoner(); 
-    }, [gameName, tagLine, regionPlatform, ACCOUNT_V1_URL, SUMMONER_V4_URL, LEAGUE_V4_URL, regionGlobal]); 
+        if (gameName && tagLine) {
+            fetchData(false); // Carga inicial
+        }
+    }, [fetchData, gameName, tagLine]);
 
 
-    // 4. NUEVA FUNCIÓN: CARGAR MÁS PARTIDAS
+    // 4. FUNCIÓN: CARGAR MÁS PARTIDAS (Paginación)
     const loadMoreMatches = async () => {
-        // Si no tenemos datos base, no hacemos nada
         if (!accountInfo || !fetchState.data) return;
 
         setIsLoadingMore(true);
-
         const apiKey = import.meta.env.VITE_RIOT_API_KEY; 
-        const COUNT_TO_LOAD = 5; // Cuantas cargar por click
+        const COUNT_TO_LOAD = 5;
 
         try {
-            // A. Pedimos las siguientes partidas usando el índice guardado
             const newMatches = await fetchMatchHistory(
                 accountInfo.puuid, 
                 apiKey, 
                 accountInfo.regionGlobal, 
-                matchStartIndex, // start
-                COUNT_TO_LOAD    // count
+                matchStartIndex, 
+                COUNT_TO_LOAD
             );
 
-            // B. Actualizamos el índice para el siguiente click
             setMatchStartIndex(prev => prev + COUNT_TO_LOAD);
 
-            // C. Actualizamos el estado "pegando" las nuevas partidas al final
             setFetchState(prevState => {
                 if (!prevState.data) return prevState; 
-
                 return {
                     ...prevState,
                     data: {
@@ -208,5 +205,10 @@ export const useFetchSummoner = (gameName: string, tagLine: string, regionPlatfo
         }
     };
 
-    return { ...fetchState, loadMoreMatches, isLoadingMore };
+    // 5. FUNCIÓN: ACTUALIZAR TODO (Refresh)
+    const updateAllData = () => {
+        fetchData(true); // isManualUpdate = true
+    };
+
+    return { ...fetchState, loadMoreMatches, updateAllData, isUpdating, isLoadingMore };
 };

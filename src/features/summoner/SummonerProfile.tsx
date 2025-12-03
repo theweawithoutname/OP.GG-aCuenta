@@ -3,12 +3,46 @@ import React from 'react';
 import SummonerIcon from '../icons/SummonerIcon';
 import SummonerRank from './SummonerRank';
 import MatchHistoryList from './MatchHistoryList';
+// 1. IMPORTAMOS EL ICONO DE REFRESCO
+import { ArrowPathIcon } from '@heroicons/react/24/outline'; 
 
-const SummonerProfile: React.FC<SummonerProfileProps> = ({ data, onLoadMore, isLoadingMore}) => {
+const SummonerProfile: React.FC<SummonerProfileProps> = ({ 
+  data, 
+  onLoadMore, 
+  isLoadingMore, 
+  isUpdating, // ⬅️ Usamos este estado
+  onUpdate    // ⬅️ Y esta función
+}) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 p-6 min-h-full h-fit bg-bg-default rounded-lg">
+      
+      {/* === COLUMNA IZQUIERDA (SIDEBAR) === */}
       <div className="flex flex-col space-y-6">
-        <div className="flex flex-col items-center p-6 rounded-lg bg-bg-surface text-center shadow-lg">
+        
+        {/* TARJETA DE PERFIL */}
+        {/* 2. AÑADIMOS 'relative' AQUÍ para posicionar el botón dentro */}
+        <div className="relative flex flex-col items-center p-6 rounded-lg bg-bg-surface text-center shadow-lg">
+          
+          {/* 3. --- BOTÓN DE UPDATE (NUEVO) --- */}
+          <button 
+            onClick={onUpdate}
+            disabled={isUpdating} // Deshabilita el click si ya está actualizando
+            // Tooltip nativo simple al pasar el mouse
+            title="Actualizar datos ahora"
+            className={`
+                absolute top-3 right-3 
+                p-2 rounded-full 
+                text-text-muted hover:text-primary hover:bg-bg-default 
+                transition-all duration-300 border border-transparent hover:border-border-color
+
+                ${isUpdating ? 'animate-spin text-primary cursor-not-allowed bg-bg-default border-border-color' : ''}
+            `}
+          >
+            <ArrowPathIcon className="w-6 h-6" />
+          </button>
+          {/* --------------------------------- */}
+
+
           <div className="mb-4">
             <SummonerIcon 
               iconUrl={data.profileIconUrl} 
@@ -21,23 +55,26 @@ const SummonerProfile: React.FC<SummonerProfileProps> = ({ data, onLoadMore, isL
               {data.name}
               <span className="text-text-muted font-normal text-lg ml-1">#{data.tagLine}</span>
             </h2> 
-            {/* Etiquetas o info extra (simulado como en la imagen) */}
             <div className="mt-2 inline-block px-3 py-1 bg-bg-default rounded-full text-sm text-primary font-medium">
               Nivel: {data.level}
             </div>
           </div>
         </div>
         
-        {/* B. Sección de Rangos */}
+        {/* Sección de Rangos */}
         <div className="bg-bg-surface rounded-lg shadow-lg overflow-hidden">
              <SummonerRank ranks={data.ranks || []} />
         </div>
 
       </div>
 
-      {/* === COLUMNA DERECHA (CONTENIDO PRINCIPAL) === */}
+      {/* === COLUMNA DERECHA (HISTORIAL) === */}
       <div className="flex flex-col space-y-6">
-        <MatchHistoryList matches={data.matchHistory || []} onLoadMore = {onLoadMore} isLoadingMore = {isLoadingMore} />
+        <MatchHistoryList 
+            matches={data.matchHistory || []} 
+            onLoadMore={onLoadMore} 
+            isLoadingMore={isLoadingMore} 
+        />
       </div>
 
     </div>

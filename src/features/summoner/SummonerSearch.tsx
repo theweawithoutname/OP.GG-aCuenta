@@ -18,7 +18,14 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({
   loaderVariant = 'gif'
 }) => {
 
-  const { loadMoreMatches, isLoadingMore, ...fetchState } = useFetchSummoner(
+  // ✅ CORRECCIÓN: Extraemos TODAS las funciones y estados necesarios
+  const { 
+    loadMoreMatches, 
+    updateAllData, 
+    isUpdating, 
+    isLoadingMore, // ⬅️ ¡Aquí está! No hay que borrarlo
+    ...fetchState 
+  } = useFetchSummoner(
     initialGameName, 
     initialTagLine, 
     initialRegionPlatform
@@ -27,11 +34,11 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({
   return (
     <div className="p-8">
 
-      {/* 🟡 1. BARRA SUPERIOR (SIEMPRE VISIBLE AL CARGAR) */}
-      {fetchState.loading && <TopLoader />}
+      {/* 1. BARRA SUPERIOR (Carga inicial O Actualización manual) */}
+      {(fetchState.loading || isUpdating) && <TopLoader />}
 
 
-      {/* 🟡 2. GIF DE KATARINA (SOLO SI ES VARIANT 'GIF') */}
+      {/* 2. GIF DE KATARINA (Solo carga inicial y si es variant 'gif') */}
       {fetchState.loading && loaderVariant === 'gif' && (
         <div className='flex justify-center mt-10'>
            <img 
@@ -42,19 +49,24 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({
         </div>
       )}
 
-      {/* 🟢 CONTRATO: Datos cargados */}
+      {/* 3. PERFIL (Datos cargados) */}
       {fetchState.data && (
         <div className="mt-6 rounded-lg">
-          {/* 👇 Pasamos loadMoreMatches al perfil */}
           <SummonerProfile 
             data={fetchState.data} 
+            
+            /* Props para Paginación */
             onLoadMore={loadMoreMatches}
-            isLoadingMore={isLoadingMore}
+            isLoadingMore={isLoadingMore} // ⬅️ Lo pasamos al perfil
+            
+            /* Props para Actualizar (Refresh) */
+            onUpdate={updateAllData}
+            isUpdating={isUpdating}
           /> 
         </div>
       )}
 
-      {/* 🔴 Error */}
+      {/* 4. ERROR */}
       {fetchState.error && (
         <p className="mt-6 p-4 text-red-700 bg-red-100 border-l-4 border-red-500 rounded">
           {fetchState.error}
