@@ -46,16 +46,22 @@ const ProfilePage: React.FC = () => {
                 </div>
             </header>
 
-            <main className="w-full max-w-7xl mx-auto px-4">
-                {/* Ajusté el padding-top (pt-32) porque el header ahora puede ser un poco más alto */}
-                <div className="bg-bg-surface p-4 pb-0 pt-32 min-h-full rounded-lg">
-                    <SummonerSearch 
-                        initialGameName={gameName!} 
-                        initialTagLine={tagLine!} 
-                        initialRegionPlatform={regionPlatform!}
-                    />
-                </div>
-            </main>
+<main className="w-full max-w-7xl mx-auto px-4">
+    <div className="
+            relative
+            bg-bg-surface 
+            pt-32 pb-20 px-4
+            w-full
+            min-h-[calc(100vh-2rem)]
+            flex flex-col gap-4
+        ">
+        <SummonerSearch 
+            initialGameName={gameName!} 
+            initialTagLine={tagLine!} 
+            initialRegionPlatform={regionPlatform!}
+        />
+    </div>
+</main>
         </>
     );
 };

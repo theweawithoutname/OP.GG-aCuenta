@@ -4,9 +4,9 @@ import SummonerIcon from '../icons/SummonerIcon';
 import SummonerRank from './SummonerRank';
 import MatchHistoryList from './MatchHistoryList';
 
-const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
+const SummonerProfile: React.FC<SummonerProfileProps> = ({ data, onLoadMore, isLoadingMore}) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 p-6 h-dvh bg-bg-default rounded-lg">
+    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 p-6 min-h-full h-fit bg-bg-default rounded-lg">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-col items-center p-6 rounded-lg bg-bg-surface text-center shadow-lg">
           <div className="mb-4">
@@ -37,13 +37,7 @@ const SummonerProfile: React.FC<SummonerProfileProps> = ({ data }) => {
 
       {/* === COLUMNA DERECHA (CONTENIDO PRINCIPAL) === */}
       <div className="flex flex-col space-y-6">
-        
-        {/* Aquí podrías poner el gráfico de dona (Stats) en el futuro */}
-        {/* <StatsSummary ... /> */}
-
-        {/* C. Historial de Partidas */}
-        {/* MatchHistoryList ahora ocupará todo el ancho disponible de esta columna */}
-        <MatchHistoryList matches={data.matchHistory || []} />
+        <MatchHistoryList matches={data.matchHistory || []} onLoadMore = {onLoadMore} isLoadingMore = {isLoadingMore} />
       </div>
 
     </div>

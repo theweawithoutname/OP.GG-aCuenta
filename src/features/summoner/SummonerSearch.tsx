@@ -18,21 +18,20 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({
   loaderVariant = 'gif'
 }) => {
 
-  const fetchState = useFetchSummoner(initialGameName, initialTagLine, initialRegionPlatform);
+  const { loadMoreMatches, isLoadingMore, ...fetchState } = useFetchSummoner(
+    initialGameName, 
+    initialTagLine, 
+    initialRegionPlatform
+  );
 
   return (
     <div className="p-8">
 
       {/* 🟡 1. BARRA SUPERIOR (SIEMPRE VISIBLE AL CARGAR) */}
-      {/* Eliminamos la condición 'loaderVariant === bar'. 
-          Ahora, siempre que cargue datos, verás la línea turquesa arriba del todo.
-          Esto da esa sensación de continuidad desde el Home. 
-      */}
       {fetchState.loading && <TopLoader />}
 
 
       {/* 🟡 2. GIF DE KATARINA (SOLO SI ES VARIANT 'GIF') */}
-      {/* Este se mantiene en el centro de la pantalla */}
       {fetchState.loading && loaderVariant === 'gif' && (
         <div className='flex justify-center mt-10'>
            <img 
@@ -46,7 +45,12 @@ const SummonerSearch: React.FC<SummonerSearchProps> = ({
       {/* 🟢 CONTRATO: Datos cargados */}
       {fetchState.data && (
         <div className="mt-6 rounded-lg">
-          <SummonerProfile data={fetchState.data} /> 
+          {/* 👇 Pasamos loadMoreMatches al perfil */}
+          <SummonerProfile 
+            data={fetchState.data} 
+            onLoadMore={loadMoreMatches}
+            isLoadingMore={isLoadingMore}
+          /> 
         </div>
       )}
 

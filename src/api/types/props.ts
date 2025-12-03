@@ -17,4 +17,5 @@ export interface SummonerIconProps {
 
 export interface SummonerProfileProps {
   data: SummonerData;
+  onLoadMore: () => void;
 }

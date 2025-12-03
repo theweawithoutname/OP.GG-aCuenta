@@ -20,13 +20,15 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, [location]);
 
-  return (
-    <div className="
-      w-full min-h-dvh bg-bg-default flex justify-center
+return (
+  <div className="
+      block 
+      w-full 
+      min-h-screen
+      bg-bg-default
       scrollbar-thin scrollbar-thumb-primary scrollbar-track-bg-surface
     ">
       
-      {/* 4. Renderizamos la barra si estamos navegando */}
       {isNavigating && <TopLoader />}
 
       <Routes>

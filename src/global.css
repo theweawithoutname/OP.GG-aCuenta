@@ -80,3 +80,13 @@
 ::-webkit-scrollbar-corner {
   background-color: var(--color-bg-surface); 
 }
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background-color: #1a1a1a; /* <--- CAMBIA ESTO POR TU COLOR OSCURO REAL */
+  margin: 0;
+  padding: 0;
+}
