@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  /* === A. PALETA NEUTRAL (El 60%) === */
+  --color-bg-default: #FFFFFF;     
+  --color-bg-surface: #F4F4F5;    
+  --color-border-color: #D4D4D8; 
+  --color-text-base: #18181B;    
+  --color-text-muted: #52525B;   
+
+  /* === B. PALETA PRIMARIA (Tu Marca - El 30%) === */
+  --color-primary: #31b478;       
+  --color-primary-hover: #227e55; 
+  --color-primary-text: #FFFFFF;  
+  
+  /* === C. PALETA DE ACENTOS (Datos - El 10%) === */
+  --color-accent-win: #A3E635;    
+  --color-accent-loss: #EF4444;   
+  --color-accent-rank: #FBBF24;   
+
+  /* === Tu "Pila" de Tipografía === */
+  --font-family-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-family-serif: ui-serif, Georgia, serif;
+  --font-family-heading: var(--font-family-sans);
+
+  /* === ANIMACIONES (AQUÍ ESTABA EL ERROR) === */
+  /* 1. Registramos la animación aquí dentro */
+  --animate-loading-bar: loading-indeterminate 1.5s infinite linear;
+
+  /* 2. Definimos los Keyframes aquí dentro también */
+  @keyframes loading-indeterminate {
+    0% {
+      left: -40%;
+      width: 40%;
+    }
+    50% {
+      left: 20%;
+      width: 80%;
+    }
+    100% {
+      left: 100%;
+      width: 100%;
+    }
+  }
+}
+
+/* === OVERRIDES PARA MODO OSCURO === */
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-bg-default: #18181B;   
+    --color-bg-surface: #27272A;  
+    --color-border-color: #3F3F46; 
+    --color-text-base: #F4F4F5;    
+    --color-text-muted: #A1A1AA;   
+  }
+}
+
+/* === ESTILOS GLOBALES (Scrollbar) === */
+/* Esto sí debe ir fuera de @theme porque es CSS estándar */
+
+::-webkit-scrollbar {
+  width: 8px; 
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary); 
+  border-radius: 10px;
+  border: 2px solid var(--color-bg-surface);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: var(--color-bg-surface); 
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background-color: #1a1a1a; /* <--- CAMBIA ESTO POR TU COLOR OSCURO REAL */
+  margin: 0;
+  padding: 0;
+}
